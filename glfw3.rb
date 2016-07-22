@@ -3,6 +3,7 @@ class Glfw3 < Formula
   homepage "http://www.glfw.org/"
   url "https://github.com/glfw/glfw/archive/3.2.tar.gz"
   sha256 "cb3aab46757981a39ae108e5207a1ecc4378e68949433a2b040ce2e17d8f6aa6"
+  head "https://github.com/glfw/glfw.git"
 
   bottle do
     cellar :any
@@ -25,9 +26,6 @@ class Glfw3 < Formula
 
   def install
     ENV.universal_binary if build.universal?
-
-    # make library name consistent
-    inreplace "CMakeLists.txt", /set\(GLFW_LIB_NAME\sglfw\)\n.*else\(\)\n/, ""
 
     args = std_cmake_args + %W[
       -DGLFW_USE_CHDIR=TRUE
@@ -58,8 +56,17 @@ class Glfw3 < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "-I#{include}", "-L#{lib}", "-lglfw3",
-           testpath/"test.c", "-o", "test"
+
+    if build.with? "shared-library"
+      system ENV.cc, "test.c", "-o", "test",
+             "-I#{include}", "-L#{lib}", "-lglfw"
+    else
+      system ENV.cc, "test.c", "-o", "test",
+             "-I#{include}", "-L#{lib}", "-lglfw3",
+             "-framework", "IOKit",
+             "-framework", "CoreVideo",
+             "-framework", "AppKit"
+    end
     system "./test"
   end
 end
