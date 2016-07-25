@@ -4,6 +4,7 @@ class Gnupg21 < Formula
   url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.13.tar.bz2"
   mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.13.tar.bz2"
   sha256 "4f9d83a6221daa60130fa79f0b1d37d6c20fffdd0320b640c7a597c5b6219675"
+  revision 1
 
   bottle do
     sha256 "4badc6179f850d075d1068e1b5dd2cb9e8c57a58f1a21ffc561aa755bfddf945" => :el_capitan
@@ -33,7 +34,13 @@ class Gnupg21 < Formula
   depends_on "gettext"
   depends_on "adns"
   depends_on "libusb-compat" => :recommended
-  depends_on "readline" => :optional
+  depends_on "libusb" => :linked if build.with? "libusb-compat"
+  if MacOS.version == :mavericks
+    depends_on "sqlite"
+    depends_on "readline"
+  else
+    depends_on "readline" => :optional
+  end
   depends_on "homebrew/fuse/encfs" => :optional
 
   conflicts_with "gnupg2",
