@@ -217,7 +217,7 @@ class Boost155 < Formula
 
   def caveats
     s = ""
-    # ENV.compiler doesn"t exist in caveats. Check library availability
+    # ENV.compiler doesn't exist in caveats. Check library availability
     # instead.
     if Dir["#{lib}/libboost_log*"].empty?
       s += <<-EOS.undent
