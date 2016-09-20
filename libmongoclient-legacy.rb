@@ -1,7 +1,7 @@
 class LibmongoclientLegacy < Formula
   homepage "https://www.mongodb.org"
-  url "https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.1.tar.gz"
-  sha256 "c48c80b019aa2f439982943d3fc94547d8c7760194528f81f3cb1965fc7eb6e6"
+  url "https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.1.2.tar.gz"
+  sha256 "8c52cae798086c3e9d0e6fe488c3378601db858cc71944b6b83440d8b00298f4"
 
   head "https://github.com/mongodb/mongo-cxx-driver.git", :branch => "legacy"
 
