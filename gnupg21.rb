@@ -1,9 +1,9 @@
 class Gnupg21 < Formula
   desc "GNU Privacy Guard: a free PGP replacement"
   homepage "https://www.gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.13.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.13.tar.bz2"
-  sha256 "4f9d83a6221daa60130fa79f0b1d37d6c20fffdd0320b640c7a597c5b6219675"
+  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.15.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.15.tar.bz2"
+  sha256 "c28c1a208f1b8ad63bdb6b88d252f6734ff4d33de6b54e38494b11d49e00ffdd"
 
   bottle do
     sha256 "4badc6179f850d075d1068e1b5dd2cb9e8c57a58f1a21ffc561aa755bfddf945" => :el_capitan
@@ -11,15 +11,8 @@ class Gnupg21 < Formula
     sha256 "e759f7df6242fd5f25bb18e7c9daa880cfb6f56bcddc067ff37dfbf1d5f65e0d" => :mavericks
   end
 
-  head do
-    url "git://git.gnupg.org/gnupg.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
   option "with-gpgsplit", "Additionally install the gpgsplit utility"
+  option "with-test", "Verify the build with `make check`"
 
   depends_on "pkg-config" => :build
   depends_on "sqlite" => :build if MacOS.version == :mavericks
@@ -37,26 +30,17 @@ class Gnupg21 < Formula
   depends_on "homebrew/fuse/encfs" => :optional
 
   conflicts_with "gnupg2",
-        :because => "GPG2.1.x is incompatible with the 2.0.x branch."
+        because: "GPG2.1.x is incompatible with the 2.0.x branch."
   conflicts_with "gpg-agent",
-        :because => "GPG2.1.x ships an internal gpg-agent which it must use."
+        because: "GPG2.1.x ships an internal gpg-agent which it must use."
   conflicts_with "dirmngr",
-        :because => "GPG2.1.x ships an internal dirmngr which it it must use."
+        because: "GPG2.1.x ships an internal dirmngr which it it must use."
   conflicts_with "fwknop",
-        :because => "fwknop expects to use a `gpgme` with Homebrew/Homebrew's gnupg2."
+        because: "fwknop expects to use a `gpgme` with Homebrew/Homebrew's gnupg2."
   conflicts_with "gpgme",
-        :because => "gpgme currently requires 1.x.x or 2.0.x."
-
-  # Patch for `make check` failures in 2.1.13.
-  # Fixed upstream by Justus Winter & can be removed in next release.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/7b2211b/gnupg21/spawned_child_8f79c31b.diff"
-    sha256 "fde57b1e484aa738af8f582910330cadef144430d9221d3242b5f635c7f41dbe"
-  end
+        because: "gpgme currently requires 1.x.x or 2.0.x."
 
   def install
-    (var/"run").mkpath
-
     ENV.append "LDFLAGS", "-lresolv"
     ENV["gl_cv_absolute_stdint_h"] = "#{MacOS.sdk_path}/usr/include/stdint.h"
 
@@ -72,12 +56,6 @@ class Gnupg21 < Formula
 
     args << "--with-readline=#{Formula["readline"].opt_prefix}" if build.with? "readline"
 
-    if build.head?
-      args << "--enable-maintainer-mode"
-      system "./autogen.sh", "--force"
-      system "automake", "--add-missing"
-    end
-
     # Adjust package name to fit our scheme of packaging both gnupg 1.x and
     # and 2.1.x and gpg-agent separately.
     inreplace "configure" do |s|
@@ -88,7 +66,11 @@ class Gnupg21 < Formula
     system "./configure", *args
 
     system "make"
-    system "make", "check"
+
+    # intermittent "FAIL: gpgtar.scm" and "FAIL: ssh.scm"
+    # https://bugs.gnupg.org/gnupg/issue2425
+    system "make", "check" if build.with? "test"
+
     system "make", "install"
 
     bin.install "tools/gpgsplit" => "gpgsplit2" if build.with? "gpgsplit"
@@ -98,6 +80,10 @@ class Gnupg21 < Formula
     mv share/"doc/gnupg2/examples/gpgconf.conf", share/"doc/gnupg2/examples/gpgconf21.conf"
     mv share/"info/gnupg.info", share/"info/gnupg21.info"
     mv man7/"gnupg.7", man7/"gnupg21.7"
+  end
+
+  def post_install
+    (var/"run").mkpath
   end
 
   def caveats; <<-EOS.undent
@@ -122,6 +108,6 @@ class Gnupg21 < Formula
   end
 
   test do
-    system "#{bin}/gpgconf"
+    system bin/"gpgconf"
   end
 end
