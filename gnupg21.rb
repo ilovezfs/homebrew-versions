@@ -4,6 +4,7 @@ class Gnupg21 < Formula
   url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.15.tar.bz2"
   mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.15.tar.bz2"
   sha256 "c28c1a208f1b8ad63bdb6b88d252f6734ff4d33de6b54e38494b11d49e00ffdd"
+  revision 1
 
   bottle do
     sha256 "c4d5d69e0eb0ec0b6afcb4c2c054d56be24777fca9c2236aa21086d52b441d2c" => :sierra
@@ -39,6 +40,19 @@ class Gnupg21 < Formula
         :because => "fwknop expects to use a `gpgme` with Homebrew/Homebrew's gnupg2."
   conflicts_with "gpgme",
         :because => "gpgme currently requires 1.x.x or 2.0.x."
+
+  # Workaround for libgpg-error-1.25, which causes "Assertion failed: (res == 0)"
+  # See https://lists.gnupg.org/pipermail/gnupg-devel/2016-November/032184.html
+  # agent, dirmngr, scd: npth_init must be after fork.
+  # https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=commit;h=eda17649f8bd3b8ce7bfc00a3c11cbcae63c845d
+  # Fix hang due to deferred thread initialization.
+  # https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=commit;h=d1ccab5176d7719328b287544b54b85e0277b146
+  # agent, dirmngr, scd: Fix init_common_subsystems.
+  # https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=commit;h=fc0b392e766af8127094e8b529d25abb84ad1d65
+  patch do
+    url "https://gist.githubusercontent.com/ilovezfs/886cb0a52b0c51b8063ba95fde615d31/raw/cbbec3d6cdce1241f3656c8ebd73c14c5d060b7d/gistfile1.txt"
+    sha256 "0423ac51346127d63bb568def8bfc16eb5e6ab64c40f0a76d88a8a4aaaec4368"
+  end
 
   def install
     ENV.append "LDFLAGS", "-lresolv"
