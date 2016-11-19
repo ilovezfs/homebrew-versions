@@ -1,9 +1,9 @@
 class Gnupg21 < Formula
   desc "GNU Privacy Guard: a free PGP replacement"
   homepage "https://www.gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.15.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.15.tar.bz2"
-  sha256 "c28c1a208f1b8ad63bdb6b88d252f6734ff4d33de6b54e38494b11d49e00ffdd"
+  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.16.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.16.tar.bz2"
+  sha256 "49b9a6a6787ad00d4d2d69d8c7ee8905923782583f06078a064a0c80531d8844"
 
   bottle do
     sha256 "c4d5d69e0eb0ec0b6afcb4c2c054d56be24777fca9c2236aa21086d52b441d2c" => :sierra
@@ -12,7 +12,10 @@ class Gnupg21 < Formula
   end
 
   option "with-gpgsplit", "Additionally install the gpgsplit utility"
+  option "without-libusb", "Disable the internal CCID driver"
   option "with-test", "Verify the build with `make check`"
+
+  deprecated_option "without-libusb-compat" => "without-libusb"
 
   depends_on "pkg-config" => :build
   depends_on "sqlite" => :build if MacOS.version == :mavericks
@@ -25,7 +28,7 @@ class Gnupg21 < Formula
   depends_on "pinentry"
   depends_on "gettext"
   depends_on "adns"
-  depends_on "libusb-compat" => :recommended
+  depends_on "libusb" => :recommended
   depends_on "readline" => :optional
   depends_on "homebrew/fuse/encfs" => :optional
 
@@ -41,8 +44,7 @@ class Gnupg21 < Formula
         :because => "gpgme currently requires 1.x.x or 2.0.x."
 
   def install
-    ENV.append "LDFLAGS", "-lresolv"
-    ENV["gl_cv_absolute_stdint_h"] = "#{MacOS.sdk_path}/usr/include/stdint.h"
+    ENV.append "LDFLAGS", "-lintl"
 
     args = %W[
       --disable-dependency-tracking
@@ -54,6 +56,7 @@ class Gnupg21 < Formula
       --with-pinentry-pgm=#{Formula["pinentry"].opt_bin}/pinentry
     ]
 
+    args << "--disable-ccid-driver" if build.without? "libusb"
     args << "--with-readline=#{Formula["readline"].opt_prefix}" if build.with? "readline"
 
     # Adjust package name to fit our scheme of packaging both gnupg 1.x and
