@@ -13,7 +13,7 @@ class Gnupg21 < Formula
 
   option "with-gpgsplit", "Additionally install the gpgsplit utility"
   option "without-libusb", "Disable the internal CCID driver"
-  option "with-test", "Verify the build with `make check`"
+  option "without-test", "Don't verify the build with `make check`"
 
   deprecated_option "without-libusb-compat" => "without-libusb"
 
@@ -69,15 +69,8 @@ class Gnupg21 < Formula
     end
 
     system "./configure", *args
-
     system "make"
-
-    # Intermittent "FAIL: gpgtar.scm" and "FAIL: ssh.scm"
-    # Reported 25 Jul 2016 https://bugs.gnupg.org/gnupg/issue2425
-    # Starting in 2.1.16, "can't connect to the agent: IPC connect call failed"
-    # Reported 19 Nov 2016 https://bugs.gnupg.org/gnupg/issue2847
     system "make", "check" if build.with? "test"
-
     system "make", "install"
 
     bin.install "tools/gpgsplit" => "gpgsplit2" if build.with? "gpgsplit"
