@@ -52,14 +52,8 @@ class Boost155 < Formula
       url "https://github.com/boostorg/chrono/commit/143260d.diff"
       sha256 "f6f40b576725b15ddfe24497ddcd597f387dfdf674f6dd301b8dcb723593ee22"
     end
-
-    # Patch boost::serialization for Clang
-    # https://svn.boost.org/trac/boost/ticket/8757
-    patch :p1 do
-      url "https://gist.githubusercontent.com/philacs/375303205d5f8918e700/raw/d6ded52c3a927b6558984d22efe0a5cf9e59cd8c/0005-Boost.S11n-include-missing-algorithm.patch"
-      sha256 "cb134e3982e01ba5b3d5abe51cc8343c9e24ecd34aa4d81f5e8dd4461f593cf1"
-    end
   end
+
   bottle do
     cellar :any
     rebuild 1
@@ -106,6 +100,12 @@ class Boost155 < Formula
   end
 
   def install
+    # Patch boost::serialization for Clang
+    # https://svn.boost.org/trac/boost/raw-attachment/ticket/8757/0005-Boost.S11n-include-missing-algorithm.patch
+    inreplace "boost/archive/iterators/transform_width.hpp",
+      "#include <boost/iterator/iterator_traits.hpp>",
+      "#include <boost/iterator/iterator_traits.hpp>\n#include <algorithm>"
+
     # https://svn.boost.org/trac/boost/ticket/8841
     if build.with?("mpi") && build.with?("single")
       raise <<-EOS.undent
