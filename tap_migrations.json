@@ -11,6 +11,7 @@
   "cloog-ppl015": "homebrew/core",
   "cloog018": "homebrew/core",
   "coq83": "homebrew/boneyard",
+  "eigen32": "homebrew/core",
   "elasticsearch17": "homebrew/core",
   "elasticsearch24": "homebrew/core",
   "gcc46": "homebrew/core",
