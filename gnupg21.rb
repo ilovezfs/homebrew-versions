@@ -4,6 +4,7 @@ class Gnupg21 < Formula
   url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.18.tar.bz2"
   mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.18.tar.bz2"
   sha256 "d04c6fab7e5562ce4b915b22020e34d4c1a256847690cf149842264fc7cef994"
+  revision 1
 
   bottle do
     sha256 "92a72f415dfb309f8d8c432990b720c64d21529c8343105b35b7aeb538b94883" => :sierra
@@ -43,6 +44,26 @@ class Gnupg21 < Formula
   conflicts_with "gpgme",
         :because => "gpgme currently requires 1.x.x or 2.0.x."
 
+  # Remove for > 2.1.18
+  # ssh-import.scm fails on Yosemite
+  # Reported 7 Feb 2017 https://bugs.gnupg.org/gnupg/issue2947
+  # https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=patch;h=56aa85f88f6b35fb03a2dc1a95882d49a74290e3
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/ea1e9f8/gnupg21/ssh-import-scm.patch"
+    sha256 "888bce2b16cb7acca6521bc242721f703678b4e6d19b89b578b467f8d669e4f0"
+  end
+
+  # Remove for > 2.1.18
+  # "gnupg-2.1.18 fails to read a Yubikey Neo that gnupg-2.1.17 reads fine"
+  # Upstream issue from 26 Jan 2017 https://bugs.gnupg.org/gnupg/issue2933
+  patch do
+    url "https://mirrors.ocf.berkeley.edu/debian/pool/main/g/gnupg2/gnupg2_2.1.18-6.debian.tar.bz2"
+    mirror "https://mirrorservice.org/sites/ftp.debian.org/debian/pool/main/g/gnupg2/gnupg2_2.1.18-6.debian.tar.bz2"
+    sha256 "fc8a74741a0383afcc8abef63a9449750c99051eb8b6e841e5aae62a2976969f"
+    apply "patches/0028-scd-Backport-two-fixes-from-master.patch",
+          "patches/0029-scd-Fix-use-case-of-PC-SC.patch"
+  end
+
   def install
     args = %W[
       --disable-dependency-tracking
@@ -67,13 +88,7 @@ class Gnupg21 < Formula
     system "./configure", *args
 
     system "make"
-
-    # ssh-import.scm fails on Yosemite
-    # Reported 7 Feb 2017 https://bugs.gnupg.org/gnupg/issue2947
-    if build.with?("test") && MacOS.version >= :el_capitan
-      system "make", "check"
-    end
-
+    system "make", "check"
     system "make", "install"
 
     bin.install "tools/gpgsplit" => "gpgsplit2" if build.with? "gpgsplit"
