@@ -43,6 +43,7 @@
   "node6-lts": "homebrew/core",
   "ppl011": "homebrew/core",
   "protobuf250": "homebrew/core",
+  "protobuf260": "homebrew/core",
   "qt55": "homebrew/core",
   "scala210": "homebrew/core",
   "scala211": "homebrew/core",
