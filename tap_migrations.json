@@ -28,6 +28,7 @@
   "gmp4": "homebrew/core",
   "go14": "homebrew/core",
   "go15": "homebrew/core",
+  "go16": "homebrew/core",
   "isl011": "homebrew/core",
   "isl012": "homebrew/core",
   "isl014": "homebrew/core",
