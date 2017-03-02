@@ -1,10 +1,9 @@
 class Gnupg21 < Formula
   desc "GNU Privacy Guard: a free PGP replacement"
   homepage "https://www.gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.18.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.18.tar.bz2"
-  sha256 "d04c6fab7e5562ce4b915b22020e34d4c1a256847690cf149842264fc7cef994"
-  revision 1
+  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.1.19.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnupg/gnupg-2.1.19.tar.bz2"
+  sha256 "46cced1f5641ce29cc28250f52fadf6e417e649b3bfdec49a5a0d0b22a639bf0"
 
   bottle do
     sha256 "1fda666df6abaf92e72ae74b06f18d1630857f882700867997af48613c8b036f" => :sierra
@@ -14,7 +13,7 @@ class Gnupg21 < Formula
 
   option "with-gpgsplit", "Additionally install the gpgsplit utility"
   option "without-libusb", "Disable the internal CCID driver"
-  option "without-test", "Don't verify the build with `make check`"
+  option "with-test", "Verify the build with `make check`"
 
   deprecated_option "without-libusb-compat" => "without-libusb"
 
@@ -44,26 +43,6 @@ class Gnupg21 < Formula
   conflicts_with "gpgme",
         :because => "gpgme currently requires 1.x.x or 2.0.x."
 
-  # Remove for > 2.1.18
-  # ssh-import.scm fails on Yosemite
-  # Reported 7 Feb 2017 https://bugs.gnupg.org/gnupg/issue2947
-  # https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=patch;h=56aa85f88f6b35fb03a2dc1a95882d49a74290e3
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/ea1e9f8/gnupg21/ssh-import-scm.patch"
-    sha256 "888bce2b16cb7acca6521bc242721f703678b4e6d19b89b578b467f8d669e4f0"
-  end
-
-  # Remove for > 2.1.18
-  # "gnupg-2.1.18 fails to read a Yubikey Neo that gnupg-2.1.17 reads fine"
-  # Upstream issue from 26 Jan 2017 https://bugs.gnupg.org/gnupg/issue2933
-  patch do
-    url "https://mirrors.ocf.berkeley.edu/debian/pool/main/g/gnupg2/gnupg2_2.1.18-6.debian.tar.bz2"
-    mirror "https://mirrorservice.org/sites/ftp.debian.org/debian/pool/main/g/gnupg2/gnupg2_2.1.18-6.debian.tar.bz2"
-    sha256 "fc8a74741a0383afcc8abef63a9449750c99051eb8b6e841e5aae62a2976969f"
-    apply "patches/0028-scd-Backport-two-fixes-from-master.patch",
-          "patches/0029-scd-Fix-use-case-of-PC-SC.patch"
-  end
-
   def install
     args = %W[
       --disable-dependency-tracking
@@ -88,7 +67,14 @@ class Gnupg21 < Formula
     system "./configure", *args
 
     system "make"
-    system "make", "check"
+
+    # Two upstream issues affect "make check" in 2.1.19:
+    # 1. "make check" cannot run before "make install"
+    # Reported 1 Mar 2017 https://bugs.gnupg.org/gnupg/issue2979
+    # 2. ssh-import.scm fails during "make check"
+    # Reported 1 Mar 2017 https://bugs.gnupg.org/gnupg/issue2980
+    system "make", "check" if build.with? "test"
+
     system "make", "install"
 
     bin.install "tools/gpgsplit" => "gpgsplit2" if build.with? "gpgsplit"
