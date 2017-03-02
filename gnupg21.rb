@@ -13,7 +13,6 @@ class Gnupg21 < Formula
 
   option "with-gpgsplit", "Additionally install the gpgsplit utility"
   option "without-libusb", "Disable the internal CCID driver"
-  option "with-test", "Verify the build with `make check`"
 
   deprecated_option "without-libusb-compat" => "without-libusb"
 
@@ -43,6 +42,10 @@ class Gnupg21 < Formula
   conflicts_with "gpgme",
         :because => "gpgme currently requires 1.x.x or 2.0.x."
 
+  # ssh-import.scm fails during "make check" for sandboxed builds
+  # Reported 1 Mar 2017 https://bugs.gnupg.org/gnupg/issue2980
+  patch :DATA
+
   def install
     args = %W[
       --disable-dependency-tracking
@@ -66,16 +69,11 @@ class Gnupg21 < Formula
 
     system "./configure", *args
 
-    system "make"
-
-    # Two upstream issues affect "make check" in 2.1.19:
-    # 1. "make check" cannot run before "make install"
-    # Reported 1 Mar 2017 https://bugs.gnupg.org/gnupg/issue2979
-    # 2. ssh-import.scm fails during "make check"
-    # Reported 1 Mar 2017 https://bugs.gnupg.org/gnupg/issue2980
-    system "make", "check" if build.with? "test"
-
     system "make", "install"
+
+    # "make check" cannot run before "make install"
+    # Reported 1 Mar 2017 https://bugs.gnupg.org/gnupg/issue2979
+    system "make", "check"
 
     bin.install "tools/gpgsplit" => "gpgsplit2" if build.with? "gpgsplit"
 
@@ -115,3 +113,14 @@ class Gnupg21 < Formula
     system bin/"gpgconf"
   end
 end
+
+__END__
+diff --git a/tests/openpgp/gpg-agent.conf.tmpl b/tests/openpgp/gpg-agent.conf.tmpl
+index 355915015..4340a0498 100644
+--- a/tests/openpgp/gpg-agent.conf.tmpl
++++ b/tests/openpgp/gpg-agent.conf.tmpl
+@@ -1,3 +1,4 @@
+ allow-preset-passphrase
+ no-grab
+ enable-ssh-support
++disable-scdaemon
