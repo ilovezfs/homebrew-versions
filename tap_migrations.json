@@ -43,7 +43,6 @@
   "node010": "homebrew/core",
   "node012": "homebrew/core",
   "node4-lts": "homebrew/core",
-  "node5": "homebrew/core",
   "node6-lts": "homebrew/core",
   "ppl011": "homebrew/core",
   "protobuf250": "homebrew/core",
