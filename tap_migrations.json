@@ -8,6 +8,7 @@
   "autoconf213": "homebrew/core",
   "autoconf264": "homebrew/core",
   "automake112": "homebrew/core",
+  "bash-completion2": "homebrew/core",
   "boost155": "homebrew/core",
   "boost157": "homebrew/core",
   "boost159": "homebrew/core",
