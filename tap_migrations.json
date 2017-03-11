@@ -46,6 +46,8 @@
   "node012": "homebrew/core",
   "node4-lts": "homebrew/core",
   "node6-lts": "homebrew/core",
+  "postgresql94": "homebrew/core",
+  "postgresql95": "homebrew/core",
   "ppl011": "homebrew/core",
   "protobuf250": "homebrew/core",
   "protobuf260": "homebrew/core",
