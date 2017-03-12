@@ -16,6 +16,7 @@
   "cloog-ppl015": "homebrew/core",
   "cloog018": "homebrew/core",
   "coq83": "homebrew/boneyard",
+  "drush5": "homebrew/php",
   "eigen32": "homebrew/core",
   "elasticsearch17": "homebrew/core",
   "elasticsearch24": "homebrew/core",
