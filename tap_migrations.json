@@ -52,6 +52,7 @@
   "protobuf250": "homebrew/core",
   "protobuf260": "homebrew/core",
   "qt55": "homebrew/core",
+  "rebar3": "homebrew/core",
   "scala210": "homebrew/core",
   "scala211": "homebrew/core",
   "tomcat6": "homebrew/core",
