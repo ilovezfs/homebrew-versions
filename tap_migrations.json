@@ -54,6 +54,8 @@
   "protobuf260": "homebrew/core",
   "qt55": "homebrew/core",
   "rebar3": "homebrew/core",
+  "redis26": "homebrew/core",
+  "redis28": "homebrew/core",
   "ruby187": "homebrew/core",
   "ruby193": "homebrew/core",
   "ruby20": "homebrew/core",
