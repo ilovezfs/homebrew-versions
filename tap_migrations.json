@@ -26,7 +26,6 @@
   "docker171": "homebrew/core",
   "drush5": "homebrew/php",
   "eigen32": "homebrew/core",
-  "elasticsearch17": "homebrew/core",
   "elasticsearch24": "homebrew/core",
   "erlang-r18": "homebrew/core",
   "ffmpeg28": "homebrew/core",
